@@ -1,0 +1,30 @@
+import cv2
+import numpy as np
+
+# Load Image
+image = cv2.imread("prescription.jpg")
+
+# Convert to Grayscale
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# Apply Contrast Enhancement (Histogram Equalization)
+equalized = cv2.equalizeHist(gray)
+
+# Apply Gaussian Blur (to reduce noise)
+blurred = cv2.GaussianBlur(equalized, (5,5), 0)
+
+# Adaptive Thresholding for Better Text Clarity
+thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+# Increase Text Thickness (Dilation)
+kernel = np.ones((3,3), np.uint8)  # Increase kernel size to make text bolder
+bold_text = cv2.dilate(thresh, kernel, iterations=2)
+
+# Upscale Image to Increase Font Size
+upscaled = cv2.resize(bold_text, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+
+# Save & Show Result
+cv2.imwrite("enhanced_prescription.jpg", upscaled)
+cv2.imshow("Enhanced Image", upscaled)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
